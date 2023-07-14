@@ -73,7 +73,7 @@ class BukuController extends Controller
             return response()->json([
                 'status' => false,
                 'message' => "Data tidak ditemukan!",
-            ], 404);
+            ]);
         }
     }
 

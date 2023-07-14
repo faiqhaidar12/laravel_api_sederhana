@@ -37,7 +37,33 @@ class BukuController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $judul = $request->judul;
+        $pengarang = $request->pengarang;
+        $tgl_publikasi = $request->tgl_publikasi;
+
+        $simpanData = [
+            'judul' => $judul,
+            'pengarang' => $pengarang,
+            'tgl_publikasi' => $tgl_publikasi,
+        ];
+
+
+        $client = new Client();
+        $url = "http://127.0.0.1:8000/api/buku";
+
+        $response = $client->request('POST', $url, [
+            'headers' => ['Content-type' => 'application/json'],
+            'body' => json_encode($simpanData)
+        ]);
+        $content = $response->getBody()->getContents();
+        $contentArray = json_decode($content, true);
+
+        if ($contentArray['status'] != true) {
+            $error = $contentArray['data'];
+            return redirect()->to('buku')->withErrors($error)->withInput();
+        } else {
+            return redirect()->to('buku')->with('success', 'Berhasil menambah data');
+        }
     }
 
     /**
@@ -53,7 +79,20 @@ class BukuController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $client = new Client();
+        $url = "http://127.0.0.1:8000/api/buku/$id";
+
+        $response = $client->request('GET', $url);
+        $content = $response->getBody()->getContents();
+        $contentArray = json_decode($content, true);
+
+        if ($contentArray['status'] != true) {
+            $error = $contentArray['message'];
+            return redirect()->to('buku')->withErrors($error);
+        } else {
+            $data = $contentArray['data'];
+            return view('buku.index', ['data' => $data]);
+        }
     }
 
     /**
@@ -61,7 +100,33 @@ class BukuController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $judul = $request->judul;
+        $pengarang = $request->pengarang;
+        $tgl_publikasi = $request->tgl_publikasi;
+
+        $simpanData = [
+            'judul' => $judul,
+            'pengarang' => $pengarang,
+            'tgl_publikasi' => $tgl_publikasi,
+        ];
+
+
+        $client = new Client();
+        $url = "http://127.0.0.1:8000/api/buku/$id";
+
+        $response = $client->request('PUT', $url, [
+            'headers' => ['Content-type' => 'application/json'],
+            'body' => json_encode($simpanData)
+        ]);
+        $content = $response->getBody()->getContents();
+        $contentArray = json_decode($content, true);
+
+        if ($contentArray['status'] != true) {
+            $error = $contentArray['data'];
+            return redirect()->to('buku')->withErrors($error)->withInput();
+        } else {
+            return redirect()->to('buku')->with('success', 'Berhasil update data');
+        }
     }
 
     /**
@@ -69,6 +134,17 @@ class BukuController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $client = new Client();
+        $url = "http://127.0.0.1:8000/api/buku/$id";
+        $response = $client->request('DELETE', $url);
+        $content = $response->getBody()->getContents();
+        $contentArray = json_decode($content, true);
+
+        if ($contentArray['status'] != true) {
+            $error = $contentArray['data'];
+            return redirect()->to('buku')->withErrors($error)->withInput();
+        } else {
+            return redirect()->to('buku')->with('success', 'Berhasil hapus data');
+        }
     }
 }
