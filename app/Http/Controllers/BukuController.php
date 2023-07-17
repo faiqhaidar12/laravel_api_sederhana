@@ -10,16 +10,25 @@ class BukuController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+
+    const API_URL = 'http://127.0.0.1:8000/api/buku';
+    public function index(Request $request)
     {
+        $currentUrl = url()->current();
         $client = new Client();
-        $url = "http://127.0.0.1:8000/api/buku";
+        $url = static::API_URL;
+        if ($request->input('page') != '') {
+            $url .= "?page=" . $request->input('page');
+        }
         // $url1 = "https://quran-api.santrikoding.com/api/surah";
 
         $response = $client->request('GET', $url);
         $content = $response->getBody()->getContents();
         $contentArray = json_decode($content, true);
         $data = $contentArray['data'];
+        foreach ($data['links'] as $key => $value) {
+            $data['links'][$key]['url2'] = str_replace(static::API_URL, $currentUrl, $value['url']);
+        }
 
         return view('buku.index', ['data' => $data]);
     }
